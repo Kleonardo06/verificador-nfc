@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificador de Autenticidad NFC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#121212',
+                        darker: '#0a0a0a',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.cdnfonts.com/css/genzi" rel="stylesheet">
+    <style>
+        .nfc-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+        @keyframes rotate {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+        .authentic-badge {
+            animation: bounce 0.5s ease;
+        }
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+<body class="bg-dark min-h-screen flex flex-col text-white">
+    <div class="text-center py-6">
+        <h1 class="text-4xl font-bold tracking-wider" style="
+            font-family: 'Genzi', sans-serif;
+            color: #000;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            text-shadow: 
+                0 0 5px #000,
+                0 0 10px #000,
+                0 0 15px #000,
+                0 0 20px #000,
+                0 0 35px #000,
+                0 0 40px #000,
+                0 0 50px #000,
+                0 0 75px #000;
+            animation: flicker 1.5s infinite alternate;
+            display: inline-block;
+        ">NOIR</h1>
+    </div>
+    
+    <style>
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                text-shadow: 
+                    0 0 5px #000,
+                    0 0 10px #000,
+                    0 0 15px #000,
+                    0 0 20px #000,
+                    0 0 35px #000,
+                    0 0 40px #000,
+                    0 0 50px #000,
+                    0 0 75px #000;
+            }
+            20%, 24%, 55% {
+                text-shadow: none;
+                opacity: 0.8;
+            }
+        }
+        
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        
+        h1:hover {
+            animation: glitch 0.3s ease-in-out infinite;
+        }
+    </style>
+    <!-- Página principal de escaneo -->
+    <div id="scanPage" class="flex-1 flex flex-col items-center justify-center p-6 text-center">
+        <div class="max-w-md w-full bg-darker rounded-xl shadow-lg overflow-hidden p-8 border border-gray-800">
+            <div class="text-center mb-6">
+                <!-- Reemplaza la imagen por la tuya -->
+                <img src="tu-imagen.png" alt="Logo" class="w-32 h-32 mx-auto mb-4 rounded-full object-cover">
+                <h1 class="text-2xl font-bold text-white mb-2">Verificador de Autenticidad</h1>
+                <p class="text-gray-400">Acerca tu dispositivo NFC al lector para verificar la autenticidad del producto</p>
+            </div>
+            
+            <div class="flex flex-col items-center mb-8">
+                <div class="nfc-animation bg-blue-100 rounded-full p-6 mb-4">
+                    <i class="fas fa-rss text-6xl text-blue-500"></i>
+                </div>
+                <p class="text-gray-500 text-sm">Esperando lectura NFC...</p>
+            </div>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 text-left">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-info-circle text-blue-500"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-700">
+                            Asegúrate de que la función NFC esté activada en tu dispositivo móvil.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Página de autenticidad (oculta inicialmente) -->
+    <div id="authPage" class="hidden flex-1 flex flex-col items-center justify-center p-6 text-center bg-darker">
+        <div class="max-w-md w-full bg-darker rounded-xl shadow-lg overflow-hidden p-8 border border-gray-800">
+            <div class="authentic-badge bg-green-900 bg-opacity-30 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-check-circle text-5xl text-green-500"></i>
+            </div>
+            
+            <h1 class="text-3xl font-bold text-white mb-2">¡Producto Auténtico!</h1>
+            <p class="text-gray-400 mb-6">Este producto ha sido verificado como original.</p>
+            
+            <div class="bg-green-900 bg-opacity-20 rounded-lg p-4 mb-6 border border-green-800">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-certificate text-green-500"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-green-800">ID de Verificación</h3>
+                        <p class="text-sm text-green-700 mt-1" id="nfcId">NFC-123456789</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-gray-800 p-3 rounded-lg border border-gray-700">
+                    <i class="fas fa-calendar-alt text-gray-400 mb-1"></i>
+                    <p class="text-xs text-gray-400">Fecha de registro</p>
+                    <p class="text-sm font-medium text-white">15/06/2023</p>
+                </div>
+                <div class="bg-gray-800 p-3 rounded-lg border border-gray-700">
+                    <i class="fas fa-map-marker-alt text-gray-400 mb-1"></i>
+                    <p class="text-xs text-gray-400">Origen</p>
+                    <p class="text-sm font-medium text-white">España</p>
+                </div>
+            </div>
+            
+            <button id="scanAgainBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+                <i class="fas fa-redo mr-2"></i> Escanear otro producto
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Simulación de detección NFC
+        document.addEventListener('DOMContentLoaded', function() {
+            const scanPage = document.getElementById('scanPage');
+            const authPage = document.getElementById('authPage');
+            const scanAgainBtn = document.getElementById('scanAgainBtn');
+            
+            // Simular detección de NFC después de 3 segundos (para demostración)
+            setTimeout(function() {
+                // Generar un ID NFC aleatorio para demostración
+                const nfcId = 'NFC-' + Math.floor(Math.random() * 1000000000).toString().padStart(9, '0');
+                document.getElementById('nfcId').textContent = nfcId;
+                
+                // Mostrar página de autenticidad
+                scanPage.classList.add('hidden');
+                authPage.classList.remove('hidden');
+            }, 3000);
+            
+            // Escuchar el evento de toque para simular NFC en dispositivos móviles
+            document.addEventListener('click', function() {
+                // Solo activar si aún estamos en la página de escaneo
+                if (!scanPage.classList.contains('hidden')) {
+                    // Generar un ID NFC aleatorio para demostración
+                    const nfcId = 'NFC-' + Math.floor(Math.random() * 1000000000).toString().padStart(9, '0');
+                    document.getElementById('nfcId').textContent = nfcId;
+                    
+                    // Mostrar página de autenticidad
+                    scanPage.classList.add('hidden');
+                    authPage.classList.remove('hidden');
+                }
+            });
+            
+            // Botón para escanear de nuevo
+            scanAgainBtn.addEventListener('click', function() {
+                authPage.classList.add('hidden');
+                scanPage.classList.remove('hidden');
+            });
+            
+            // Implementación real de NFC (solo funcionará en dispositivos con soporte)
+            if ('NDEFReader' in window) {
+                const nfcReader = new NDEFReader();
+                
+                async function startNFCScan() {
+                    try {
+                        await nfcReader.scan();
+                        console.log("Escáner NFC iniciado. Acerca un tag NFC.");
+                        
+                        nfcReader.onreading = event => {
+                            console.log("Tag NFC detectado");
+                            const decoder = new TextDecoder();
+                            let nfcContent = "";
+                            
+                            for (const record of event.message.records) {
+                                if (record.recordType === "text") {
+                                    nfcContent = decoder.decode(record.data);
+                                } else if (record.recordType === "url") {
+                                    nfcContent = decoder.decode(record.data);
+                                }
+                            }
+                            
+                            // Mostrar el ID del NFC
+                            document.getElementById('nfcId').textContent = nfcContent || "NFC-"+event.serialNumber;
+                            
+                            // Cambiar a página de autenticidad
+                            scanPage.classList.add('hidden');
+                            authPage.classList.remove('hidden');
+                        };
+                        
+                    } catch (error) {
+                        console.error("Error al iniciar NFC:", error);
+                    }
+                }
+                
+                startNFCScan();
+            } else {
+                console.log("NFC no está disponible en este navegador");
+            }
+        });
+    </script>
+</body>
+</html>
